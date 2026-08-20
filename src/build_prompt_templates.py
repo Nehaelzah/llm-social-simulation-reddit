@@ -1,0 +1,133 @@
+from __future__ import annotations
+
+import argparse
+
+from capstone_pipeline_utils import PROMPTS_DIR, SIM_DIR, ensure_output_dirs, save_json
+
+
+def build_prompt_payload() -> dict:
+    ensure_output_dirs()
+
+    payload = {
+        "project_note": (
+            "Prompt templates for a first lightweight simulation trial on Reddit-style reactions to streaming price changes. "
+            "The target style is short, casual, opinionated comment text rather than polished prose."
+        ),
+        "base_template": {
+            "name": "base_reddit_price_reaction",
+            "template": (
+                "You are writing one Reddit comment reacting to a recent {platform} subscription price change.\\n"
+                "Context: {scenario_summary}\\n"
+                "Write only the comment text. Prefer 1 to 2 sentences and keep it under 45 words.\\n"
+                "Tone: casual, conversational, a little blunt or annoyed if that fits.\\n"
+                "Constraints:\\n"
+                "- Mention the pricing change, value, ads, bundle, or cancellation decision only if it feels natural.\\n"
+                "- Do not write a list.\\n"
+                "- Do not write like a journalist, customer support agent, moderator, or press release.\\n"
+                "- No greetings, apologies, hashtags, emojis, or direct questions to the reader.\\n"
+                "- Do not mention being an AI.\\n"
+                "- Keep it plausible for a real Reddit user."
+            ),
+        },
+        "persona_templates": [
+            {
+                "persona": "price_sensitive_canceller",
+                "description": "Feels the service crossed a value threshold and is ready to cancel or downgrade.",
+                "template_addition": (
+                    "Persona framing: You are price-sensitive and think the latest increase may not be worth it. "
+                    "You might mention cancelling, downgrading, rotating subscriptions, or spending limits."
+                ),
+            },
+            {
+                "persona": "frustrated_loyal_subscriber",
+                "description": "Used to like the platform but is increasingly annoyed by recurring price changes.",
+                "template_addition": (
+                    "Persona framing: You have stayed subscribed for a while, but repeated price bumps are wearing you down. "
+                    "Sound disappointed or irritated rather than purely furious."
+                ),
+            },
+            {
+                "persona": "ad_tier_bundle_skeptic",
+                "description": "Focuses on ad tiers, bundles, and whether premium pricing still makes sense.",
+                "template_addition": (
+                    "Persona framing: You care about ads, ad-free tiers, bundles, and whether premium plans still justify the cost."
+                ),
+            },
+            {
+                "persona": "value_for_money_comparer",
+                "description": "Compares the service against cable, rivals, or other subscriptions.",
+                "template_addition": (
+                    "Persona framing: You compare this service against alternatives and think in value-for-money terms. "
+                    "You may compare Netflix or Disney+ to cable, other streamers, or rotating subscriptions."
+                ),
+            },
+        ],
+        "platform_scenarios": [
+            {
+                "platform": "Netflix",
+                "scenario_summary": (
+                    "Netflix users are discussing another subscription price increase, including concerns about ad-tier pricing "
+                    "and whether the catalogue still justifies the cost."
+                ),
+            },
+            {
+                "platform": "DisneyPlus",
+                "scenario_summary": (
+                    "Disney+ users are reacting to higher subscription prices and bundle changes involving Hulu and ad-free options."
+                ),
+            },
+        ],
+        "generation_guidelines": [
+            "Prefer 8 to 40 words unless the input scenario naturally calls for something shorter.",
+            "Use first-person phrasing often enough to feel like a real reaction.",
+            "Avoid hashtags, emojis, greetings, and customer-service language.",
+            "Some comments can be neutral or resigned, but most should still feel human and situated in the price-change discussion.",
+        ],
+    }
+
+    save_json(PROMPTS_DIR / "simulation_prompt_templates.json", payload)
+
+    markdown_lines = [
+        "# Simulation Prompt Templates",
+        "",
+        "## Base Template",
+        "",
+        payload["base_template"]["template"],
+        "",
+        "## Persona Additions",
+        "",
+    ]
+    for entry in payload["persona_templates"]:
+        markdown_lines.append(f"### {entry['persona']}")
+        markdown_lines.append("")
+        markdown_lines.append(entry["description"])
+        markdown_lines.append("")
+        markdown_lines.append(entry["template_addition"])
+        markdown_lines.append("")
+
+    markdown_lines.append("## Platform Scenarios")
+    markdown_lines.append("")
+    for entry in payload["platform_scenarios"]:
+        markdown_lines.append(f"### {entry['platform']}")
+        markdown_lines.append("")
+        markdown_lines.append(entry["scenario_summary"])
+        markdown_lines.append("")
+
+    markdown_lines.append("## Generation Guidelines")
+    markdown_lines.append("")
+    markdown_lines.extend([f"- {line}" for line in payload["generation_guidelines"]])
+    (PROMPTS_DIR / "simulation_prompt_templates.md").write_text("\n".join(markdown_lines) + "\n", encoding="utf-8")
+    save_json(SIM_DIR / "scenario_definitions.json", payload)
+    return payload
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Build reusable prompt templates for the simulation trial.")
+    parser.parse_args()
+    payload = build_prompt_payload()
+    print(f"Saved prompt templates to: {PROMPTS_DIR}")
+    print(f"Persona templates: {len(payload['persona_templates'])}")
+
+
+if __name__ == "__main__":
+    main()

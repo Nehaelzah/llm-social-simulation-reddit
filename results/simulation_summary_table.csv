@@ -1,0 +1,2 @@
+model,num_generated_comments,bertscore_precision,bertscore_recall,bertscore_f1,mauve_status,mauve_note
+Qwen/Qwen2.5-0.5B-Instruct,200,0.847,0.8384,0.8425,skipped,"MAUVE is optional in this local workflow because it can be heavy and brittle on lightweight CPU setups. Keep it in the methodology, but treat BERTScore plus stance/sentiment distributions as the practical first-pass result."

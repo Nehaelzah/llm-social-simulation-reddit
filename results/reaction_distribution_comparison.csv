@@ -1,0 +1,11 @@
+set_name,reaction_label,count,share
+real,neutral_or_information,119,0.595
+real,cancel_or_leave,39,0.195
+real,ad_tier_or_bundle_concern,35,0.175
+real,value_comparison,4,0.02
+real,frustrated_but_still_engaged,3,0.015
+generated,neutral_or_information,60,0.3
+generated,frustrated_but_still_engaged,56,0.28
+generated,ad_tier_or_bundle_concern,40,0.2
+generated,cancel_or_leave,27,0.135
+generated,value_comparison,17,0.085

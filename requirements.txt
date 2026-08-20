@@ -1,0 +1,11 @@
+pandas>=3.0
+matplotlib>=3.10
+requests>=2.32
+transformers>=5.3.0
+torch>=2.11.0
+bert-score>=0.3.13
+sentencepiece>=0.2.1
+safetensors>=0.7.0
+accelerate>=1.13.0
+# Optional for MAUVE if you choose to try it locally:
+# mauve-text

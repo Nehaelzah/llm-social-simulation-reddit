@@ -1,0 +1,7 @@
+set_name,sentiment_label,count,share
+real,mixed_or_neutral,148,0.74
+real,negative,30,0.15
+real,positive,22,0.11
+generated,mixed_or_neutral,155,0.775
+generated,negative,23,0.115
+generated,positive,22,0.11
